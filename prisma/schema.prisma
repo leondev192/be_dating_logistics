@@ -1,0 +1,153 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String         @id @default(auto()) @map("_id") @db.ObjectId      
+  email        String        @unique 
+  phone        String        
+  password     String
+  role         String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  companies    Company[]
+  posts        Post[]         @relation("UserPosts")
+  matches      Match[]        @relation("UserMatches")
+  chats        Chat[]
+  notifications Notification[]
+  ratings      Rating[]       @relation("UserRatings")
+}
+
+model Company {
+  id                   String  @id @default(auto()) @map("_id") @db.ObjectId
+  user                 User    @relation(fields: [userId], references: [id])
+  userId               String  @db.ObjectId
+  companyName          String
+  address              String?
+  businessCode         String?
+  taxCode              String?
+  representativeName   String
+  representativeId     String
+  profilePictureUrl    String?
+  posts                Post[]
+}
+
+model Post {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  company       Company   @relation(fields: [companyId], references: [id])
+  companyId     String    @db.ObjectId
+  postType      String
+  cargoType     String?
+  vehicleType   String?
+  quantity      Float?
+  origin        String?
+  destination   String?
+  transportTime DateTime?
+  status        String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  matches       Match[]   @relation("PostMatches")
+  matchedPosts  Match[]   @relation("MatchedPostMatches")
+  user          User      @relation("UserPosts", fields: [userId], references: [id])
+  userId        String    @db.ObjectId
+}
+
+model Match {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  post        Post     @relation("PostMatches", fields: [postId], references: [id])
+  postId      String   @db.ObjectId
+  matchedPost Post     @relation("MatchedPostMatches", fields: [matchedPostId], references: [id])
+  matchedPostId String @db.ObjectId
+  status      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  chats       Chat[]
+  ratings     Rating[] @relation("MatchRatings")
+  user        User     @relation("UserMatches", fields: [userId], references: [id])
+  userId      String   @db.ObjectId
+}
+
+model Chat {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  match      Match    @relation(fields: [matchId], references: [id])
+  matchId    String   @db.ObjectId
+  message    String
+  sender     User     @relation(fields: [senderId], references: [id])
+  senderId   String   @db.ObjectId
+  createdAt  DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @db.ObjectId
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Rating {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  match     Match    @relation("MatchRatings", fields: [matchId], references: [id])
+  matchId   String   @db.ObjectId
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+  user      User     @relation("UserRatings", fields: [userId], references: [id])
+  userId    String   @db.ObjectId
+}
+
+model Otp {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  email      String   @unique
+  otp        String
+  password     String
+  createdAt  DateTime @default(now())
+  expiresAt  DateTime // thời gian hết hạn OTP
+}
+
+model OtpForgotPassword {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  email      String   @unique
+  otp        String
+  createdAt  DateTime @default(now())
+  expiresAt  DateTime // thời gian hết hạn OTP
+}
+
+model Token {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  token      String
+  createdAt  DateTime @default(now())
+  expiresAt  DateTime // thời gian hết hạn token để reset password
+}
+
+enum Role {
+  logistics
+  customer
+  carrier
+}
+
+enum PostType {
+  request
+  offer
+}
+
+enum PostStatus {
+  active
+  matched
+  completed
+}
+
+enum MatchStatus {
+  pending
+  confirmed
+  completed
+  cancelled
+}
