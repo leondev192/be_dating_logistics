@@ -10,10 +10,12 @@ datasource db {
 }
 
 model User {
-  id           String         @id @default(auto()) @map("_id") @db.ObjectId      
+  id           String         @id @default(auto()) @map("_id") @db.ObjectId
+  username     String         
+  password     String
   email        String        @unique 
   phone        String        
-  password     String
+  verified     Boolean       
   role         String
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
