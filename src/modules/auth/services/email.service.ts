@@ -1,4 +1,3 @@
-// src/modules/auth/services/email.service.ts
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 
@@ -19,11 +18,17 @@ export class EmailService {
   }
 
   async sendVerificationEmail(email: string, otp: string) {
-    await this.transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: 'Mã OTP xác nhận tài khoản',
-      text: `Mã OTP của bạn là: ${otp}. Mã này có hiệu lực trong 5 phút.`,
-    });
+    try {
+      // Gửi email không đồng bộ để tránh chờ đợi lâu
+      await this.transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: 'Mã OTP xác nhận tài khoản',
+        text: `Mã OTP của bạn là: ${otp}. Mã này có hiệu lực trong 5 phút.`,
+      });
+      console.log(`Email sent successfully to ${email}`);
+    } catch (error) {
+      console.error('Error sending email:', error);
+    }
   }
 }

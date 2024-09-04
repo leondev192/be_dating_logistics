@@ -2,9 +2,9 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from '../services/auth.service';
-import { RegisterDto } from '../dtos/register.dto';
-import { VerifyOtpDto } from '../dtos/verify-otp.dto';
-import { LoginDto } from '../dtos/login.dto';
+import { RegisterDto } from '../dtos/register/register.dto';
+import { VerifyOtpDto } from '../dtos/register/verify-otp.dto';
+import { LoginDto } from '../dtos/login/login.dto';
 
 @ApiTags('Auth') // Tag giúp phân loại các nhóm API
 @Controller('auth')

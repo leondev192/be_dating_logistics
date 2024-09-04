@@ -1,12 +1,13 @@
 // src/modules/auth/auth.module.ts
 import { Module } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './services/auth.service';
 import { AuthController } from './controllers/auth.controller';
-import { EmailService } from './services/email.service';
-import { OtpService } from './services/otp.service';
-import { PrismaService } from '../../common/sprisma/prisma.service';
 import { UserService } from './services/user.service';
+import { OtpService } from './services/otp.service';
+import { EmailService } from './services/email.service';
+import { JwtModule } from '@nestjs/jwt';
+import { JwtStrategy } from './utils/strategies/jwt.strategy'; // Import JwtStrategy
+import { PrismaService } from '../../common/sprisma/prisma.service';
 
 @Module({
   imports: [
@@ -18,10 +19,12 @@ import { UserService } from './services/user.service';
   controllers: [AuthController],
   providers: [
     AuthService,
-    EmailService,
-    OtpService,
     UserService,
+    OtpService,
+    EmailService,
     PrismaService,
+    JwtStrategy, // Thêm JwtStrategy vào providers
   ],
+  exports: [AuthService],
 })
 export class AuthModule {}
