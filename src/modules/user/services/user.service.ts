@@ -80,7 +80,7 @@ export class UserService {
 
     return this.prisma.user.update({
       where: { id: userId },
-      data: { role: role }, // Cập nhật vai trò mới cho người dùng
+      data: { role: role },
     });
   }
 }

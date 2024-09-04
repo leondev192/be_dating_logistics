@@ -31,4 +31,18 @@ export class EmailService {
       console.error('Error sending email:', error);
     }
   }
+  async sendForgotPasswordEmail(email: string, otp: string): Promise<void> {
+    try {
+      await this.transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: 'Quên mật khẩu - Mã xác thực',
+        text: `Mã OTP để đặt lại mật khẩu của bạn là: ${otp}. Mã có hiệu lực trong 5 phút.`,
+      });
+      console.log('Email OTP đã được gửi.');
+    } catch (error) {
+      console.error('Gửi email thất bại:', error);
+      throw new Error('Không thể gửi email OTP.');
+    }
+  }
 }

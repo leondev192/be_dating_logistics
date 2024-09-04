@@ -14,7 +14,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    // Đảm bảo trả về userId và các thông tin cần thiết khác từ JWT payload
-    return { userId: payload.sub, email: payload.email };
+    // Trả về thông tin từ token để sử dụng trong các service
+    return {
+      userId: payload.sub,
+      email: payload.email,
+      role: payload.role,
+      companyId: payload.companyId,
+    };
   }
 }

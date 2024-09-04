@@ -8,6 +8,7 @@ import { EmailService } from './services/email.service';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './utils/strategies/jwt.strategy'; // Import JwtStrategy
 import { PrismaService } from '../../common/sprisma/prisma.service';
+import { OtpForgotPasswordService } from './services/otp-forgot-password.service';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { PrismaService } from '../../common/sprisma/prisma.service';
     EmailService,
     PrismaService,
     JwtStrategy, // Thêm JwtStrategy vào providers
+    OtpForgotPasswordService,
   ],
   exports: [AuthService],
 })

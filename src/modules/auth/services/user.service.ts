@@ -1,9 +1,14 @@
 // src/modules/auth/services/user.service.ts
-import { Injectable, Inject, forwardRef } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  forwardRef,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../../../common/sprisma/prisma.service';
 import { User } from '.prisma/client';
 import { AuthService } from './auth.service';
-
+import * as bcrypt from 'bcrypt';
 @Injectable()
 export class UserService {
   constructor(
@@ -22,18 +27,27 @@ export class UserService {
     });
   }
 
-  // Tìm người dùng theo email
-  async findUserByEmail(email: string): Promise<User | null> {
+  async findUserByEmail(email: string) {
     return this.prisma.user.findUnique({
       where: { email },
     });
   }
 
-  // Cập nhật mật khẩu người dùng
-  async updatePassword(email: string, newPassword: string): Promise<User> {
-    return this.prisma.user.update({
+  // Thêm hàm này để tìm công ty theo userId
+  async findCompanyByUserId(userId: string) {
+    return this.prisma.company.findUnique({
+      where: { userId },
+    });
+  }
+  async updatePasswordByEmail(
+    email: string,
+    hashedPassword: string,
+  ): Promise<void> {
+    await this.prisma.user.update({
       where: { email },
-      data: { password: newPassword },
+      data: {
+        password: hashedPassword,
+      },
     });
   }
 }
