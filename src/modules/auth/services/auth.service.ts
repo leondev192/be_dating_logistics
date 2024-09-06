@@ -115,7 +115,7 @@ export class AuthService {
     return {
       status: 'success',
       message: 'Đăng nhập thành công.',
-      data: { access_token: token },
+      data: { token: token },
     };
   }
 
@@ -168,14 +168,14 @@ export class AuthService {
       });
     }
 
-    const resetToken = this.jwtService.sign({ email });
+    const token = this.jwtService.sign({ email });
 
     await this.otpForgotPasswordService.deleteOtp(email);
 
     return {
       status: 'success',
       message: 'OTP xác minh thành công, mã token đã được tạo.',
-      data: { resetToken },
+      token,
     };
   }
 

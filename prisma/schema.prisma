@@ -1,5 +1,3 @@
-// schema.prisma
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,15 +9,13 @@ datasource db {
 
 model User {
   id           String         @id @default(auto()) @map("_id") @db.ObjectId
-  username     String         
-  password     String
-  email        String        @unique 
-  phone        String        
-  verified     Boolean       
-  role         String
+  email        String         @unique              // Chỉ yêu cầu email khi đăng ký
+  password     String                              // Mật khẩu của người dùng
+  phone        String?                             // Số điện thoại có thể bổ sung sau
+  role         Role?                               // Vai trò sẽ được bổ sung sau khi người dùng chọn trên màn hình thông tin
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
-  companies    Company[]
+  company      Company?                            // Quan hệ một-một với Company
   posts        Post[]         @relation("UserPosts")
   matches      Match[]        @relation("UserMatches")
   chats        Chat[]
@@ -30,14 +26,14 @@ model User {
 model Company {
   id                   String  @id @default(auto()) @map("_id") @db.ObjectId
   user                 User    @relation(fields: [userId], references: [id])
-  userId               String  @db.ObjectId
-  companyName          String
-  address              String?
-  businessCode         String?
-  taxCode              String?
-  representativeName   String
-  representativeId     String
-  profilePictureUrl    String?
+  userId               String  @unique @db.ObjectId   // Thêm @unique để định nghĩa quan hệ one-to-one
+  companyName          String?                         // Tên công ty bổ sung sau khi đăng ký
+  address              String?                         // Địa chỉ công ty
+  businessCode         String?                         // Mã kinh doanh
+  taxCode              String?                         // Mã số thuế
+  representativeName   String?                         // Tên người đại diện
+  representativeUrl     String?                         // ảnh CCCD của người đại diện
+  profilePictureUrl    String?                         // Ảnh đại diện công ty nếu có
   posts                Post[]
 }
 
@@ -45,14 +41,14 @@ model Post {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
   company       Company   @relation(fields: [companyId], references: [id])
   companyId     String    @db.ObjectId
-  postType      String
-  cargoType     String?
-  vehicleType   String?
-  quantity      Float?
-  origin        String?
-  destination   String?
-  transportTime DateTime?
-  status        String
+  postType      PostType  // Loại bài đăng: yêu cầu (request) hoặc cung cấp dịch vụ (offer)
+  cargoType     String?   // Loại hàng hóa
+  vehicleType   String?   // Loại xe
+  quantity      Float?    // Số lượng hàng hóa
+  origin        String?   // Nơi bắt đầu vận chuyển
+  destination   String?   // Nơi kết thúc vận chuyển
+  transportTime DateTime? // Thời gian vận chuyển dự kiến
+  status        PostStatus // Trạng thái bài đăng: hoạt động, đã ghép đôi, đã hoàn tất
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   matches       Match[]   @relation("PostMatches")
@@ -67,7 +63,7 @@ model Match {
   postId      String   @db.ObjectId
   matchedPost Post     @relation("MatchedPostMatches", fields: [matchedPostId], references: [id])
   matchedPostId String @db.ObjectId
-  status      String
+  status      MatchStatus // Trạng thái ghép đôi: đang chờ, đã xác nhận, hoàn tất, hủy
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   chats       Chat[]
@@ -110,7 +106,7 @@ model Otp {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   email      String   @unique
   otp        String
-  password     String
+  password   String
   createdAt  DateTime @default(now())
   expiresAt  DateTime // thời gian hết hạn OTP
 }
@@ -125,11 +121,13 @@ model OtpForgotPassword {
 
 model Token {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  token      String
+  token      String   @unique
+  email      String
   createdAt  DateTime @default(now())
   expiresAt  DateTime // thời gian hết hạn token để reset password
 }
 
+// Các enum cho các trạng thái và loại dữ liệu
 enum Role {
   logistics
   customer
