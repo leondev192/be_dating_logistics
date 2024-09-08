@@ -18,11 +18,16 @@ export class UserService {
   ) {}
 
   // Tạo người dùng mới
-  async createUser(email: string, password: string): Promise<User> {
+  async createUser(
+    email: string,
+    password: string,
+    profilePictureUrl: string,
+  ): Promise<User> {
     return this.prisma.user.create({
       data: {
         email,
         password,
+        profilePictureUrl,
       },
     });
   }
@@ -33,12 +38,6 @@ export class UserService {
     });
   }
 
-  // Thêm hàm này để tìm công ty theo userId
-  async findCompanyByUserId(userId: string) {
-    return this.prisma.company.findUnique({
-      where: { userId },
-    });
-  }
   async updatePasswordByEmail(
     email: string,
     hashedPassword: string,

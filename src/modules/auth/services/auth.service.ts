@@ -1,3 +1,4 @@
+// src/modules/auth/services/auth.service.ts
 import {
   Injectable,
   BadRequestException,
@@ -22,7 +23,6 @@ export class AuthService {
 
   // Đăng ký người dùng
   async register(email: string, password: string) {
-    // Kiểm tra email đã tồn tại
     const existingUser = await this.userService.findUserByEmail(email);
     if (existingUser) {
       throw new ConflictException({
@@ -32,10 +32,9 @@ export class AuthService {
       });
     }
 
-    // Hash mật khẩu và mã OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const [hashedPassword, hashedOtp] = await Promise.all([
-      bcrypt.hash(password, 8), // Giảm số vòng hash xuống 8 để tăng tốc độ
+      bcrypt.hash(password, 8),
       bcrypt.hash(otp, 8),
     ]);
 
@@ -52,7 +51,7 @@ export class AuthService {
     };
   }
 
-  // Xác minh OTP
+  // Xác minh OTP và tạo người dùng
   async verifyOtp(email: string, otp: string) {
     const otpRecord = await this.otpService.findOtp(email);
 
@@ -80,10 +79,17 @@ export class AuthService {
       });
     }
 
+    // Đặt link ảnh demo tạm thời
+    const profilePictureUrl = 'https://www.gravatar.com/avatar/?d=mp'; // Link ảnh icon người dùng demo
+
+    // Tạo người dùng mới với dữ liệu từ bảng OTP và ảnh demo
     const newUser = await this.userService.createUser(
       email,
       otpRecord.password,
+      profilePictureUrl,
     );
+
+    // Xóa OTP sau khi tạo tài khoản người dùng
     await this.otpService.deleteOtp(email);
 
     return {
@@ -99,23 +105,36 @@ export class AuthService {
       throw new BadRequestException('Thông tin đăng nhập không hợp lệ');
     }
 
-    // Sử dụng hàm findCompanyByUserId để lấy thông tin công ty
-    const company = await this.userService.findCompanyByUserId(user.id);
-    const companyId = company ? company.id : null;
-
-    // Tạo token với thông tin cần thiết
+    // Tạo payload cho token
     const payload = {
       sub: user.id,
       email: user.email,
-      role: user.role,
-      companyId: companyId,
     };
+
+    // Tạo token JWT
     const token = this.jwtService.sign(payload);
 
+    // Trả về token và thông tin chi tiết của người dùng
     return {
       status: 'success',
       message: 'Đăng nhập thành công.',
-      data: { token: token },
+      data: {
+        token: token,
+        user: {
+          id: user.id,
+          email: user.email,
+          phone: user.phone,
+          companyName: user.companyName,
+          address: user.address,
+          businessCode: user.businessCode,
+          taxCode: user.taxCode,
+          representativeName: user.representativeName,
+          representativeUrl: user.representativeUrl,
+          profilePictureUrl: user.profilePictureUrl,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        },
+      },
     };
   }
 

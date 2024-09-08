@@ -1,46 +1,77 @@
-// src/modules/user/dtos/information-company/update-company.dto.ts
+// src/modules/user/dtos/update-user.dto.ts
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
 
-export class UpdateCompanyDto {
-  @ApiProperty({ description: 'Tên công ty', example: 'ABC Company' })
-  @IsString()
+export class UpdateUserDto {
+  @ApiProperty({
+    example: 'John Doe',
+    description: 'Tên người đại diện',
+    required: false,
+  })
   @IsOptional()
-  companyName?: string;
-
-  @ApiProperty({ description: 'Địa chỉ công ty', example: '123 Street' })
   @IsString()
-  @IsOptional()
-  address?: string;
-
-  @ApiProperty({ description: 'Mã kinh doanh', example: '123456' })
-  @IsString()
-  @IsOptional()
-  businessCode?: string;
-
-  @ApiProperty({ description: 'Mã số thuế', example: '123456789' })
-  @IsString()
-  @IsOptional()
-  taxCode?: string;
-
-  @ApiProperty({ description: 'Tên người đại diện', example: 'John Doe' })
-  @IsString()
-  @IsOptional()
   representativeName?: string;
 
   @ApiProperty({
-    description: 'Số CCCD của người đại diện',
-    example: '123456789',
+    example: 'Company Name',
+    description: 'Tên công ty',
+    required: false,
   })
-  @IsString()
   @IsOptional()
-  representativeId?: string;
+  @IsString()
+  companyName?: string;
 
   @ApiProperty({
-    description: 'Ảnh đại diện công ty',
-    example: 'https://example.com/image.png',
+    example: '123 Street, City',
+    description: 'Địa chỉ công ty',
+    required: false,
   })
-  @IsString()
   @IsOptional()
+  @IsString()
+  address?: string;
+
+  @ApiProperty({
+    example: '123456',
+    description: 'Mã kinh doanh',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  businessCode?: string;
+
+  @ApiProperty({
+    example: '123456789',
+    description: 'Mã số thuế',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  taxCode?: string;
+
+  @ApiProperty({
+    example: 'profile.jpg',
+    description: 'Ảnh đại diện công ty',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
   profilePictureUrl?: string;
+
+  @ApiProperty({
+    example: 'representative.jpg',
+    description: 'Ảnh CCCD của người đại diện',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  representativeUrl?: string;
+
+  @ApiProperty({
+    example: '0987654321',
+    description: 'Số điện thoại',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  phone?: string;
 }

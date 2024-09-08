@@ -1,17 +1,15 @@
 // src/modules/user/controllers/user.controller.ts
 import {
   Controller,
-  Post,
   Patch,
+  Delete,
   Get,
   Body,
   UseGuards,
   Req,
 } from '@nestjs/common';
 import { UserService } from '../services/user.service';
-import { CreateCompanyDto } from '../dtos/information-company/create-company.dto';
-import { UpdateCompanyDto } from '../dtos/information-company/update-company.dto';
-import { UpdateRoleDto } from '../dtos/update-role.dto';
+import { UpdateUserDto } from '../dtos/information-company/update-company.dto';
 import { JwtAuthGuard } from '../../auth/utils/guards/jwt-auth.guard';
 import {
   ApiTags,
@@ -26,70 +24,42 @@ import {
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  // Thêm thông tin công ty mới
+  // Lấy thông tin người dùng
   @UseGuards(JwtAuthGuard)
-  @Post('add-company-info')
-  @ApiOperation({ summary: 'Thêm thông tin công ty mới của người dùng' })
-  @ApiResponse({
-    status: 201,
-    description: 'Thông tin công ty đã được thêm thành công.',
-  })
-  async addCompanyInfo(@Req() req, @Body() createCompanyDto: CreateCompanyDto) {
-    const userId = req.user?.userId; // Lấy userId từ token
-    if (!userId) {
-      throw new Error('User ID is required to add company info.');
-    }
-    return this.userService.addCompanyInfo(userId, createCompanyDto);
-  }
-
-  // Cập nhật thông tin công ty
-  @UseGuards(JwtAuthGuard)
-  @Patch('update-company-info')
-  @ApiOperation({ summary: 'Cập nhật thông tin công ty của người dùng' })
+  @Get('get-info')
+  @ApiOperation({ summary: 'Lấy thông tin người dùng' })
   @ApiResponse({
     status: 200,
-    description: 'Thông tin công ty đã được cập nhật thành công.',
+    description: 'Thông tin người dùng đã được lấy thành công.',
   })
-  async updateCompanyInfo(
-    @Req() req,
-    @Body() updateCompanyDto: UpdateCompanyDto,
-  ) {
-    const userId = req.user?.userId; // Lấy userId từ token
-    if (!userId) {
-      throw new Error('User ID is required to update company info.');
-    }
-    return this.userService.updateCompanyInfo(userId, updateCompanyDto);
+  async getUserInfo(@Req() req) {
+    const userId = req.user.userId; // Lấy userId từ token JWT
+    return this.userService.getUserInfo(userId);
   }
 
-  // Lấy thông tin công ty
+  // Cập nhật thông tin người dùng, ngoại trừ email và password
   @UseGuards(JwtAuthGuard)
-  @Get('get-company-info')
-  @ApiOperation({ summary: 'Lấy thông tin công ty của người dùng' })
+  @Patch('update-info')
+  @ApiOperation({ summary: 'Cập nhật thông tin cá nhân của người dùng' })
   @ApiResponse({
     status: 200,
-    description: 'Thông tin công ty của người dùng đã được lấy thành công.',
+    description: 'Thông tin người dùng đã được cập nhật thành công.',
   })
-  async getCompanyInfo(@Req() req) {
-    const userId = req.user?.userId; // Lấy userId từ token
-    if (!userId) {
-      throw new Error('User ID is required to get company info.');
-    }
-    return this.userService.getCompanyInfo(userId);
+  async updateUserInfo(@Req() req, @Body() updateUserDto: UpdateUserDto) {
+    const userId = req.user.userId; // Lấy userId từ token JWT
+    return this.userService.updateUser(userId, updateUserDto);
   }
 
-  // Cập nhật vai trò người dùng
+  // Xóa thông tin người dùng (ngoại trừ email và password)
   @UseGuards(JwtAuthGuard)
-  @Patch('update-role')
-  @ApiOperation({ summary: 'Cập nhật vai trò người dùng' })
+  @Delete('delete-info')
+  @ApiOperation({ summary: 'Xóa thông tin cá nhân của người dùng' })
   @ApiResponse({
     status: 200,
-    description: 'Vai trò người dùng đã được cập nhật.',
+    description: 'Thông tin người dùng đã được xóa thành công.',
   })
-  async updateUserRole(@Req() req, @Body() updateRoleDto: UpdateRoleDto) {
-    const userId = req.user?.userId; // Lấy userId từ req.user
-    if (!userId) {
-      throw new Error('User ID is required to update role.');
-    }
-    return this.userService.updateUserRole(userId, updateRoleDto.role);
+  async deleteUserInfo(@Req() req) {
+    const userId = req.user.userId; // Lấy userId từ token JWT
+    return this.userService.deleteUserInfo(userId);
   }
 }

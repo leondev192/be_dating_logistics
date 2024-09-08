@@ -8,140 +8,144 @@ datasource db {
 }
 
 model User {
-  id           String         @id @default(auto()) @map("_id") @db.ObjectId
-  email        String         @unique              // Chỉ yêu cầu email khi đăng ký
-  password     String                              // Mật khẩu của người dùng
-  phone        String?                             // Số điện thoại có thể bổ sung sau
-  role         Role?                               // Vai trò sẽ được bổ sung sau khi người dùng chọn trên màn hình thông tin
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  company      Company?                            // Quan hệ một-một với Company
-  posts        Post[]         @relation("UserPosts")
-  matches      Match[]        @relation("UserMatches")
-  chats        Chat[]
-  notifications Notification[]
-  ratings      Rating[]       @relation("UserRatings")
-}
-
-model Company {
-  id                   String  @id @default(auto()) @map("_id") @db.ObjectId
-  user                 User    @relation(fields: [userId], references: [id])
-  userId               String  @unique @db.ObjectId   // Thêm @unique để định nghĩa quan hệ one-to-one
-  companyName          String?                         // Tên công ty bổ sung sau khi đăng ký
-  address              String?                         // Địa chỉ công ty
-  businessCode         String?                         // Mã kinh doanh
-  taxCode              String?                         // Mã số thuế
-  representativeName   String?                         // Tên người đại diện
-  representativeUrl     String?                         // ảnh CCCD của người đại diện
-  profilePictureUrl    String?                         // Ảnh đại diện công ty nếu có
-  posts                Post[]
+  id                   String         @id @default(auto()) @map("_id") @db.ObjectId
+  email                String         @unique              // Email yêu cầu khi đăng ký
+  password             String                              // Mật khẩu của người dùng
+  phone                String?                             // Số điện thoại, có thể bổ sung sau
+  companyName          String?                             // Tên công ty
+  address              String?                             // Địa chỉ công ty
+  businessCode         String?                             // Mã kinh doanh
+  taxCode              String?                             // Mã số thuế
+  representativeName   String?                             // Tên người đại diện
+  representativeUrl    String?                             // Ảnh CCCD của người đại diện
+  profilePictureUrl    String?                             // Ảnh đại diện công ty
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+  posts                Post[]         @relation("UserPosts") // Quan hệ với các bài đăng của người dùng
+  matches              Match[]        @relation("UserMatches") // Quan hệ với các lần ghép đôi của người dùng
+  chats                Chat[]                             // Quan hệ với các cuộc trò chuyện
+  notifications        Notification[]                     // Quan hệ với thông báo
+  ratings              Rating[]       @relation("UserRatings") // Quan hệ với đánh giá từ các ghép đôi
 }
 
 model Post {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  company       Company   @relation(fields: [companyId], references: [id])
-  companyId     String    @db.ObjectId
-  postType      PostType  // Loại bài đăng: yêu cầu (request) hoặc cung cấp dịch vụ (offer)
-  cargoType     String?   // Loại hàng hóa
-  vehicleType   String?   // Loại xe
-  quantity      Float?    // Số lượng hàng hóa
-  origin        String?   // Nơi bắt đầu vận chuyển
-  destination   String?   // Nơi kết thúc vận chuyển
-  transportTime DateTime? // Thời gian vận chuyển dự kiến
-  status        PostStatus // Trạng thái bài đăng: hoạt động, đã ghép đôi, đã hoàn tất
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  matches       Match[]   @relation("PostMatches")
-  matchedPosts  Match[]   @relation("MatchedPostMatches")
-  user          User      @relation("UserPosts", fields: [userId], references: [id])
-  userId        String    @db.ObjectId
+  id                   String       @id @default(auto()) @map("_id") @db.ObjectId
+  user                 User         @relation("UserPosts", fields: [userId], references: [id]) // Người đăng bài
+  userId               String       @db.ObjectId
+  postType             PostType     // Loại bài đăng: Ghép hàng, Tìm vận chuyển, Cung cấp vận chuyển
+  status               PostStatus   // Trạng thái bài đăng: hoạt động, đã ghép đôi, đã hoàn tất
+  companyImageUrl      String?
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+
+  // Các trường chung cho tất cả loại bài đăng
+  origin               String?      // Nơi bắt đầu vận chuyển
+  destination          String?      // Nơi kết thúc vận chuyển
+  transportTime        DateTime?    // Thời gian vận chuyển dự kiến
+  returnTrip           Boolean?     // Chuyến khứ hồi (chỉ cho Cung cấp vận chuyển)
+  returnTime           DateTime?    // Thời gian khứ hồi nếu có (chỉ cho Cung cấp vận chuyển)
+
+  // Trường cho bài đăng Ghép hàng
+  hasVehicle           Boolean?     // Có xe hoặc chưa có xe
+  cargoType            String?      // Loại hàng hóa
+  cargoWeight          Float?       // Khối lượng hàng hóa
+  cargoVolume          Float?       // Thể tích hàng hóa
+  specialRequirements  String?      // Yêu cầu đặc biệt cho hàng hóa
+
+  // Trường cho bài đăng Tìm vận chuyển
+  requiredVehicleType  String?      // Loại xe yêu cầu
+  cargoTypeRequest     String?      // Loại hàng hóa
+
+  // Trường cho bài đăng Cung cấp vận chuyển
+  vehicleType          String?      // Loại xe
+  vehicleCapacity      Float?       // Trọng tải tối đa của xe
+  availableWeight      Float?       @default(0) // Trọng tải còn lại có thể ghép
+  pricePerUnit         Float?       // Giá tính theo kg hoặc tấn
+  vehicleDetails       String?      // Chi tiết về phương tiện
+
+  matches              Match[]      @relation("PostMatches") // Quan hệ với các lần ghép đôi
+  matchedPosts         Match[]      @relation("MatchedPostMatches") // Quan hệ với các bài đã ghép đôi
 }
 
 model Match {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  post        Post     @relation("PostMatches", fields: [postId], references: [id])
-  postId      String   @db.ObjectId
-  matchedPost Post     @relation("MatchedPostMatches", fields: [matchedPostId], references: [id])
-  matchedPostId String @db.ObjectId
-  status      MatchStatus // Trạng thái ghép đôi: đang chờ, đã xác nhận, hoàn tất, hủy
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  chats       Chat[]
-  ratings     Rating[] @relation("MatchRatings")
-  user        User     @relation("UserMatches", fields: [userId], references: [id])
-  userId      String   @db.ObjectId
+  id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+  post                 Post     @relation("PostMatches", fields: [postId], references: [id]) // Bài đăng liên quan
+  postId               String   @db.ObjectId
+  matchedPost          Post     @relation("MatchedPostMatches", fields: [matchedPostId], references: [id]) // Bài đăng đã ghép đôi
+  matchedPostId        String   @db.ObjectId
+  status               MatchStatus // Trạng thái ghép đôi: đang chờ, đã xác nhận, hoàn tất, hủy
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  chats                Chat[] // Quan hệ với các cuộc trò chuyện liên quan đến ghép đôi này
+  ratings              Rating[] @relation("MatchRatings") // Quan hệ với các đánh giá từ ghép đôi này
+  user                 User     @relation("UserMatches", fields: [userId], references: [id]) // Người thực hiện ghép đôi
+  userId               String   @db.ObjectId
 }
 
 model Chat {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  match      Match    @relation(fields: [matchId], references: [id])
-  matchId    String   @db.ObjectId
-  message    String
-  sender     User     @relation(fields: [senderId], references: [id])
-  senderId   String   @db.ObjectId
-  createdAt  DateTime @default(now())
+  id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+  match                Match    @relation(fields: [matchId], references: [id]) // Ghép đôi liên quan
+  matchId              String   @db.ObjectId
+  message              String   // Nội dung tin nhắn
+  sender               User     @relation(fields: [senderId], references: [id]) // Người gửi tin nhắn
+  senderId             String   @db.ObjectId
+  createdAt            DateTime @default(now())
 }
 
 model Notification {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String   @db.ObjectId
-  message   String
-  read      Boolean  @default(false)
-  createdAt DateTime @default(now())
+  id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+  user                 User     @relation(fields: [userId], references: [id]) // Người nhận thông báo
+  userId               String   @db.ObjectId
+  message              String   // Nội dung thông báo
+  read                 Boolean  @default(false) // Đã đọc hay chưa
+  createdAt            DateTime @default(now())
 }
 
 model Rating {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  match     Match    @relation("MatchRatings", fields: [matchId], references: [id])
-  matchId   String   @db.ObjectId
-  rating    Int
-  comment   String?
-  createdAt DateTime @default(now())
-  user      User     @relation("UserRatings", fields: [userId], references: [id])
-  userId    String   @db.ObjectId
+  id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+  match                Match    @relation("MatchRatings", fields: [matchId], references: [id]) // Ghép đôi được đánh giá
+  matchId              String   @db.ObjectId
+  rating               Int      // Số điểm đánh giá
+  comment              String?  // Nhận xét nếu có
+  createdAt            DateTime @default(now())
+  user                 User     @relation("UserRatings", fields: [userId], references: [id]) // Người thực hiện đánh giá
+  userId               String   @db.ObjectId
 }
 
 model Otp {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  email      String   @unique
-  otp        String
-  password   String
-  createdAt  DateTime @default(now())
-  expiresAt  DateTime // thời gian hết hạn OTP
+  id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+  email                String   @unique // Email người dùng nhận OTP
+  otp                  String   // Mã OTP
+  password             String   // Mật khẩu cho OTP
+  createdAt            DateTime @default(now())
+  expiresAt            DateTime // Thời gian hết hạn OTP
 }
 
 model OtpForgotPassword {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  email      String   @unique
-  otp        String
-  createdAt  DateTime @default(now())
-  expiresAt  DateTime // thời gian hết hạn OTP
+  id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+  email                String   @unique // Email người dùng nhận OTP quên mật khẩu
+  otp                  String   // Mã OTP
+  createdAt            DateTime @default(now())
+  expiresAt            DateTime // Thời gian hết hạn OTP
 }
 
 model Token {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  token      String   @unique
-  email      String
-  createdAt  DateTime @default(now())
-  expiresAt  DateTime // thời gian hết hạn token để reset password
+  id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+  token                String   @unique // Token để reset mật khẩu
+  email                String   // Email liên quan đến token
+  createdAt            DateTime @default(now())
+  expiresAt            DateTime // Thời gian hết hạn token
 }
 
 // Các enum cho các trạng thái và loại dữ liệu
-enum Role {
-  logistics
-  customer
-  carrier
-}
-
 enum PostType {
-  request
-  offer
+  CargoMatching           // Ghép hàng
+  LookingForTransport     // Tìm vận chuyển
+  OfferingTransport       // Cung cấp vận chuyển
 }
 
 enum PostStatus {
   active
-  matched
   completed
 }
 
@@ -151,3 +155,5 @@ enum MatchStatus {
   completed
   cancelled
 }
+
+

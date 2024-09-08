@@ -1,50 +1,82 @@
-// src/post/dto/create-post.dto.ts
-import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsEnum,
-  IsNotEmpty,
-  IsOptional,
   IsString,
+  IsEnum,
+  IsOptional,
+  IsDate,
+  IsBoolean,
   IsNumber,
 } from 'class-validator';
-import { PostType } from '@prisma/client';
+import { PostType, PostStatus } from '@prisma/client';
 
 export class CreatePostDto {
-  @ApiProperty({
-    enum: PostType,
-    description:
-      'Loại bài đăng: yêu cầu (request) hoặc cung cấp dịch vụ (offer)',
-  })
   @IsEnum(PostType)
-  @IsNotEmpty()
   postType: PostType;
 
-  @ApiProperty({ description: 'Loại hàng hóa', required: false })
+  @IsString()
+  @IsOptional()
+  origin?: string;
+
+  @IsString()
+  @IsOptional()
+  destination?: string;
+
+  @IsDate()
+  @IsOptional()
+  transportTime?: Date;
+
+  @IsBoolean()
+  @IsOptional()
+  returnTrip?: boolean;
+
+  @IsDate()
+  @IsOptional()
+  returnTime?: Date;
+
+  @IsBoolean()
+  @IsOptional()
+  hasVehicle?: boolean;
+
   @IsString()
   @IsOptional()
   cargoType?: string;
 
-  @ApiProperty({ description: 'Loại xe', required: false })
+  @IsNumber()
+  @IsOptional()
+  cargoWeight?: number;
+
+  @IsNumber()
+  @IsOptional()
+  cargoVolume?: number;
+
+  @IsString()
+  @IsOptional()
+  specialRequirements?: string;
+
+  @IsString()
+  @IsOptional()
+  requiredVehicleType?: string;
+
+  @IsString()
+  @IsOptional()
+  cargoTypeRequest?: string;
+
   @IsString()
   @IsOptional()
   vehicleType?: string;
 
-  @ApiProperty({ description: 'Số lượng hàng hóa', required: false })
   @IsNumber()
   @IsOptional()
-  quantity?: number;
+  vehicleCapacity?: number;
 
-  @ApiProperty({ description: 'Nơi bắt đầu vận chuyển' })
-  @IsString()
-  @IsNotEmpty()
-  origin: string;
-
-  @ApiProperty({ description: 'Nơi kết thúc vận chuyển' })
-  @IsString()
-  @IsNotEmpty()
-  destination: string;
-
-  @ApiProperty({ description: 'Thời gian vận chuyển dự kiến', required: false })
+  @IsNumber()
   @IsOptional()
-  transportTime?: Date;
+  availableWeight?: number;
+
+  @IsNumber()
+  @IsOptional()
+  pricePerUnit?: number;
+
+  @IsString()
+  @IsOptional()
+  vehicleDetails?: string;
 }
