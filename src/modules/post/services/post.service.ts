@@ -73,11 +73,13 @@ export class PostService {
 
     // Lấy URL ảnh đại diện công ty từ user
     const companyImageUrl = user.profilePictureUrl || '';
+    const companyName = user.companyName || 'Tên công ty chưa được cập nhật';
 
     const postData = {
       ...createPostDto,
       status: PostStatus.active,
-      companyImageUrl, // Thêm URL ảnh đại diện công ty vào bài đăng
+      companyImageUrl,
+      companyName,
       user: {
         connect: { id: userId },
       },

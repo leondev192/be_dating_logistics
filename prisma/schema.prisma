@@ -35,6 +35,7 @@ model Post {
   postType             PostType     // Loại bài đăng: Ghép hàng, Tìm vận chuyển, Cung cấp vận chuyển
   status               PostStatus   // Trạng thái bài đăng: hoạt động, đã ghép đôi, đã hoàn tất
   companyImageUrl      String?
+  companyName          String?
   createdAt            DateTime     @default(now())
   updatedAt            DateTime     @updatedAt
 

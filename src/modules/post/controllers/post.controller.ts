@@ -31,7 +31,6 @@ export class PostController {
   constructor(private readonly postService: PostService) {}
 
   // List toàn bộ bài đăng
-  @UseGuards(JwtAuthGuard)
   @Get()
   @ApiOperation({ summary: 'List toàn bộ bài đăng' })
   @ApiResponse({
@@ -43,7 +42,6 @@ export class PostController {
   }
 
   // Lấy chi tiết một bài đăng
-  @UseGuards(JwtAuthGuard)
   @Get(':id')
   @ApiOperation({ summary: 'Lấy chi tiết một bài đăng' })
   @ApiResponse({
