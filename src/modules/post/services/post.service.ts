@@ -116,7 +116,6 @@ export class PostService {
     });
   }
 
-  // Xóa thông tin bài đăng
   async deletePost(userId: string, postId: string): Promise<Post> {
     const post = await this.prisma.post.findUnique({
       where: { id: postId },
@@ -128,27 +127,9 @@ export class PostService {
       );
     }
 
-    return this.prisma.post.update({
+    // Xóa hoàn toàn bài đăng khỏi cơ sở dữ liệu
+    return this.prisma.post.delete({
       where: { id: postId },
-      data: {
-        origin: null,
-        destination: null,
-        transportTime: null,
-        returnTrip: null,
-        returnTime: null,
-        hasVehicle: null,
-        cargoType: null,
-        cargoWeight: null,
-        cargoVolume: null,
-        specialRequirements: null,
-        requiredVehicleType: null,
-        cargoTypeRequest: null,
-        vehicleType: null,
-        vehicleCapacity: null,
-        availableWeight: null,
-        pricePerUnit: null,
-        vehicleDetails: null,
-      },
     });
   }
 }
