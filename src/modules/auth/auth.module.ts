@@ -14,7 +14,7 @@ import { OtpForgotPasswordService } from './services/otp-forgot-password.service
   imports: [
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '1h' },
+      signOptions: { expiresIn: '24h' },
     }),
   ],
   controllers: [AuthController],

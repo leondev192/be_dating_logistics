@@ -7,6 +7,7 @@ import {
   Body,
   UseGuards,
   Req,
+  Param,
 } from '@nestjs/common';
 import { UserService } from '../services/user.service';
 import { UpdateUserDto } from '../dtos/information-company/update-company.dto';
@@ -61,5 +62,15 @@ export class UserController {
   async deleteUserInfo(@Req() req) {
     const userId = req.user.userId; // Lấy userId từ token JWT
     return this.userService.deleteUserInfo(userId);
+  }
+  // Lấy thông tin người dùng không cần token
+  @Get('info/:userId')
+  @ApiOperation({ summary: 'Lấy thông tin người dùng bằng ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Thông tin người dùng đã được lấy thành công.',
+  })
+  async getUserInfoById(@Param('userId') userId: string) {
+    return this.userService.getUserInfo(userId);
   }
 }
