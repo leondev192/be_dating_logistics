@@ -22,7 +22,11 @@ export class CreatePostDto {
 
   @IsDate()
   @IsOptional()
-  transportTime?: Date;
+  transportGoes?: Date;
+
+  @IsDate()
+  @IsOptional()
+  transportComes?: Date;
 
   @IsBoolean()
   @IsOptional()
@@ -42,11 +46,11 @@ export class CreatePostDto {
 
   @IsNumber()
   @IsOptional()
-  cargoWeight?: number;
+  cargoWeight?: string;
 
   @IsNumber()
   @IsOptional()
-  cargoVolume?: number;
+  cargoVolume?: string;
 
   @IsString()
   @IsOptional()
@@ -66,15 +70,15 @@ export class CreatePostDto {
 
   @IsNumber()
   @IsOptional()
-  vehicleCapacity?: number;
+  vehicleCapacity?: string;
 
   @IsNumber()
   @IsOptional()
-  availableWeight?: number;
+  availableWeight?: string;
 
   @IsNumber()
   @IsOptional()
-  pricePerUnit?: number;
+  pricePerUnit?: string;
 
   @IsString()
   @IsOptional()

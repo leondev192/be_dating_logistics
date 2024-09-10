@@ -43,15 +43,16 @@ model Post {
   // Các trường chung cho tất cả loại bài đăng
   origin               String?      // Nơi bắt đầu vận chuyển
   destination          String?      // Nơi kết thúc vận chuyển
-  transportTime        DateTime?    // Thời gian vận chuyển dự kiến
+  transportGoes        DateTime?    // Thời gian vận chuyển dự kiến
+  transportComes        DateTime?    // Thời gian vận chuyển dự kiến
   returnTrip           Boolean?     // Chuyến khứ hồi (chỉ cho Cung cấp vận chuyển)
   returnTime           DateTime?    // Thời gian khứ hồi nếu có (chỉ cho Cung cấp vận chuyển)
 
   // Trường cho bài đăng Ghép hàng
   hasVehicle           Boolean?     // Có xe hoặc chưa có xe
   cargoType            String?      // Loại hàng hóa
-  cargoWeight          Float?       // Khối lượng hàng hóa
-  cargoVolume          Float?       // Thể tích hàng hóa
+  cargoWeight          String?       // Khối lượng hàng hóa
+  cargoVolume          String?       // Thể tích hàng hóa
   specialRequirements  String?      // Yêu cầu đặc biệt cho hàng hóa
 
   // Trường cho bài đăng Tìm vận chuyển
@@ -60,9 +61,9 @@ model Post {
 
   // Trường cho bài đăng Cung cấp vận chuyển
   vehicleType          String?      // Loại xe
-  vehicleCapacity      Float?       // Trọng tải tối đa của xe
-  availableWeight      Float?       @default(0) // Trọng tải còn lại có thể ghép
-  pricePerUnit         Float?       // Giá tính theo kg hoặc tấn
+  vehicleCapacity      String?       // Trọng tải tối đa của xe
+  availableWeight      String?      
+  pricePerUnit         String?       // Giá tính theo kg hoặc tấn
   vehicleDetails       String?      // Chi tiết về phương tiện
   conversations        Conversation[] @relation("PostConversations") // Thêm quan hệ với Conversation
 
