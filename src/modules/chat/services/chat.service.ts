@@ -113,11 +113,19 @@ export class ChatService {
     });
   }
 
-  // Liệt kê tin nhắn trong một cuộc trò chuyện
   async getMessages(conversationId: string) {
     return this.prisma.message.findMany({
       where: { conversationId },
       orderBy: { createdAt: 'asc' }, // Sắp xếp tin nhắn theo thời gian từ cũ nhất đến mới nhất
+      include: {
+        sender: {
+          select: {
+            id: true, // Bao gồm id của người gửi
+            companyName: true, // Nếu muốn lấy thêm thông tin công ty
+            profilePictureUrl: true, // Nếu muốn lấy thêm avatar của người gửi
+          },
+        },
+      },
     });
   }
   // chat.service.ts
