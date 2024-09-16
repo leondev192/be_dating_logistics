@@ -78,8 +78,12 @@ export class ChatController {
     status: 200,
     description: 'Danh sách tin nhắn đã được lấy thành công.',
   })
-  async getMessages(@Param('conversationId') conversationId: string) {
-    return this.chatService.getMessages(conversationId);
+  async getMessages(
+    @Param('conversationId') conversationId: string,
+    @Req() req, // Include the request object to access user information
+  ) {
+    const userId = req.user.userId; // Extract the user ID from the JWT token
+    return this.chatService.getMessages(conversationId, userId); // Pass both conversationId and userId
   }
   // chat.controller.ts
   @Post('contact')

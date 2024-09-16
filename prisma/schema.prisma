@@ -91,6 +91,7 @@ model Message {
   senderId       String        @db.ObjectId
   sender         User          @relation("MessageSender", fields: [senderId], references: [id])
   content        String        // Nội dung tin nhắn
+  isRead         Boolean       @default(false)
   createdAt      DateTime      @default(now())
 }
 

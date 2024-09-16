@@ -9,7 +9,7 @@ import { ForgotPasswordDto } from '../dtos/forgotpassword/forgot-password.dto';
 import { VerifyOtpResetDto } from '../dtos/forgotpassword/verify-otp-reset.dto';
 import { ResetPasswordDto } from '../dtos/forgotpassword/reset-password.dto';
 
-@ApiTags('Auth') // Tag giúp phân loại các nhóm API
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -37,6 +37,7 @@ export class AuthController {
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto.email, loginDto.password);
   }
+
   @Post('forgot-password')
   @ApiOperation({ summary: 'Quên mật khẩu' })
   @ApiResponse({

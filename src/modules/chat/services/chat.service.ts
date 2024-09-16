@@ -71,7 +71,8 @@ export class ChatService {
 
   // Liệt kê các cuộc trò chuyện của người dùng
   async getUserConversations(userId: string) {
-    return this.prisma.conversation.findMany({
+    // Lấy tất cả các cuộc trò chuyện liên quan đến người dùng
+    const conversations = await this.prisma.conversation.findMany({
       where: {
         OR: [{ senderId: userId }, { receiverId: userId }],
       },
@@ -97,37 +98,66 @@ export class ChatService {
           },
         },
         messages: {
-          take: 1, // Chỉ lấy tin nhắn mới nhất
           orderBy: {
-            createdAt: 'desc', // Sắp xếp tin nhắn từ mới nhất
+            createdAt: 'desc',
           },
           select: {
             content: true,
             createdAt: true,
+            isRead: true,
+            senderId: true,
           },
+          take: 1, // Lấy tin nhắn mới nhất
         },
       },
-      orderBy: {
-        updatedAt: 'desc', // Sắp xếp cuộc trò chuyện theo thời gian cập nhật gần nhất
-      },
     });
+
+    // Sắp xếp cuộc trò chuyện theo các tin nhắn chưa đọc và tin nhắn mới nhất
+    const sortedConversations = conversations.sort((a, b) => {
+      const aUnread =
+        a.messages[0]?.isRead === false && a.messages[0]?.senderId !== userId;
+      const bUnread =
+        b.messages[0]?.isRead === false && b.messages[0]?.senderId !== userId;
+
+      if (aUnread && !bUnread) return -1; // Cuộc trò chuyện `a` có tin nhắn chưa đọc
+      if (!aUnread && bUnread) return 1; // Cuộc trò chuyện `b` có tin nhắn chưa đọc
+      return (
+        b.messages[0]?.createdAt.getTime() - a.messages[0]?.createdAt.getTime()
+      ); // Sắp xếp theo tin nhắn mới nhất
+    });
+
+    return sortedConversations;
   }
 
-  async getMessages(conversationId: string) {
-    return this.prisma.message.findMany({
+  // chat.service.ts
+  async getMessages(conversationId: string, userId: string) {
+    const messages = await this.prisma.message.findMany({
       where: { conversationId },
-      orderBy: { createdAt: 'asc' }, // Sắp xếp tin nhắn theo thời gian từ cũ nhất đến mới nhất
+      orderBy: { createdAt: 'asc' },
       include: {
         sender: {
           select: {
-            id: true, // Bao gồm id của người gửi
-            companyName: true, // Nếu muốn lấy thêm thông tin công ty
-            profilePictureUrl: true, // Nếu muốn lấy thêm avatar của người gửi
+            id: true,
+            companyName: true,
+            profilePictureUrl: true,
           },
         },
       },
     });
+
+    // Cập nhật trạng thái `isRead` của những tin nhắn chưa đọc và không phải của người dùng hiện tại
+    await this.prisma.message.updateMany({
+      where: {
+        conversationId,
+        isRead: false,
+        senderId: { not: userId },
+      },
+      data: { isRead: true },
+    });
+
+    return messages;
   }
+
   // chat.service.ts
   async createChat(createChatDto: CreateChatDto, userId: string) {
     const { postId } = createChatDto;

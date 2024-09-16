@@ -101,8 +101,11 @@ export class AuthService {
 
   async login(email: string, password: string) {
     const user = await this.userService.findUserByEmail(email);
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      throw new BadRequestException('Thông tin đăng nhập không hợp lệ');
+    if (!user) {
+      throw new BadRequestException('Email không tồn tại');
+    }
+    if (!(await bcrypt.compare(password, user.password))) {
+      throw new BadRequestException('Mật khẩu không hợp lệ, vui lòng thử lại');
     }
 
     // Tạo payload cho token

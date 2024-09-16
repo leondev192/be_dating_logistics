@@ -764,13 +764,13 @@
     multer "1.4.4-lts.1"
     tslib "2.6.3"
 
-"@nestjs/platform-socket.io@^10.4.1":
-  version "10.4.1"
-  resolved "https://registry.yarnpkg.com/@nestjs/platform-socket.io/-/platform-socket.io-10.4.1.tgz#30f5f6a54df170c6b2745c5bc9eabf7b52793b53"
-  integrity sha512-cxn5vKBAbqtEVPl0qVcJpR4sC12+hzcY/mYXGW6ippOKQDBNc2OF8oZXu6V3O1MvAl+VM7eNNEsLmP9DRKQlnw==
+"@nestjs/platform-socket.io@^10.4.2":
+  version "10.4.2"
+  resolved "https://registry.yarnpkg.com/@nestjs/platform-socket.io/-/platform-socket.io-10.4.2.tgz#9638a6652c19086307025f14259cdb91115e06db"
+  integrity sha512-EoVeBun+DnxfbVsKwqolt082tLy5aiSgnfltRa+oH28utduPGAFkuonVmVj4Bp+o42rvsCglwcVmV1Ox/HgRaQ==
   dependencies:
     socket.io "4.7.5"
-    tslib "2.6.3"
+    tslib "2.7.0"
 
 "@nestjs/schematics@^10.0.0", "@nestjs/schematics@^10.0.1":
   version "10.1.4"
@@ -802,14 +802,14 @@
   dependencies:
     tslib "2.6.3"
 
-"@nestjs/websockets@^10.4.1":
-  version "10.4.1"
-  resolved "https://registry.yarnpkg.com/@nestjs/websockets/-/websockets-10.4.1.tgz#67d370fe6d4215603e68e56666709576111a5d22"
-  integrity sha512-p0Eq94WneczV2bnLEu9hl24iCIfH5eUCGgBuYOkVDySBwvya5L+gD4wUoqIqGoX1c6rkhQa+pMR7pi1EY4t93w==
+"@nestjs/websockets@^10.4.2":
+  version "10.4.2"
+  resolved "https://registry.yarnpkg.com/@nestjs/websockets/-/websockets-10.4.2.tgz#54d380ffd4e0a2dd6cddc99ae5e60c97fa5b32b6"
+  integrity sha512-LYPwZEOMGd0zmMfV+vIXhoh4csgpQcnEKKEzwewPFp3Eomvv7/DfYmYCtBBzTiL6nYro9i2VtWHQy6uj63fIvQ==
   dependencies:
     iterare "1.2.1"
     object-hash "3.0.0"
-    tslib "2.6.3"
+    tslib "2.7.0"
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
@@ -5127,7 +5127,7 @@ tslib@2.6.3:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.6.3.tgz#0438f810ad7a9edcde7a241c3d80db693c8cbfe0"
   integrity sha512-xNvxJEOUiWPGhUuUdQgAJPKOOJfGnIyKySOc09XkKsgdUV/3E2zvwZYdejjmRgPCgcym1juLH3226yA7sEFJKQ==
 
-tslib@^2.1.0, tslib@^2.6.2:
+tslib@2.7.0, tslib@^2.1.0, tslib@^2.6.2:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.7.0.tgz#d9b40c5c40ab59e8738f297df3087bf1a2690c01"
   integrity sha512-gLXCKdN1/j47AiHiOkJN69hJmcbGTHI0ImLmbYLHykhgeN0jVGola9yVjFgzCUklsZQMW55o+dW7IXv3RCXDzA==
