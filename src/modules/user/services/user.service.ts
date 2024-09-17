@@ -8,8 +8,8 @@ import { UpdateUserDto } from '../dtos/information-company/update-company.dto';
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
-  // Lấy thông tin người dùng từ cơ sở dữ liệu
-  async getUserInfo(userId: string): Promise<User> {
+  // Lấy thông tin người dùng từ cơ sở dữ liệu, bỏ qua mật khẩu
+  async getUserInfo(userId: string): Promise<Omit<User, 'password'>> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
@@ -18,7 +18,10 @@ export class UserService {
       throw new NotFoundException('Người dùng không tồn tại.');
     }
 
-    return user;
+    // Loại bỏ trường password trước khi trả về
+    const { password, ...userWithoutPassword } = user;
+
+    return userWithoutPassword;
   }
 
   // Cập nhật thông tin người dùng, ngoại trừ email và password
@@ -59,7 +62,6 @@ export class UserService {
         companyName: null,
         address: null,
         businessCode: null,
-        taxCode: null,
         representativeName: null,
         representativeUrl: null,
         profilePictureUrl: null,

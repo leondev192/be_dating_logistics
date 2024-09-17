@@ -10,12 +10,11 @@ datasource db {
 model User {
   id                   String         @id @default(auto()) @map("_id") @db.ObjectId
   email                String         @unique              // Email yêu cầu khi đăng ký
-  password             String                              // Mật khẩu của người dùng
+  password             String?                              // Mật khẩu của người dùng
   phone                String?                             // Số điện thoại, có thể bổ sung sau
   companyName          String?                             // Tên công ty
   address              String?                             // Địa chỉ công ty
   businessCode         String?                             // Mã kinh doanh
-  taxCode              String?                             // Mã số thuế
   representativeName   String?                             // Tên người đại diện
   representativeUrl    String?                             // Ảnh CCCD của người đại diện
   profilePictureUrl    String?                             // Ảnh đại diện công ty
