@@ -9,10 +9,15 @@ import * as bcrypt from 'bcrypt';
 import { OtpService } from './otp.service';
 import { EmailService } from './email.service';
 import { UserService } from './user.service';
-import { OtpForgotPasswordService } from '../services/otp-forgot-password.service';
+import { OtpForgotPasswordService } from './otp-forgot-password.service';
+import { OAuth2Client } from 'google-auth-library';
 
 @Injectable()
 export class AuthService {
+  private client = new OAuth2Client(
+    '193742166494-vhvkbi0atp26iu8m0tlnph4js6nu32lu.apps.googleusercontent.com',
+  );
+
   constructor(
     private readonly jwtService: JwtService,
     private readonly otpService: OtpService,
@@ -79,8 +84,7 @@ export class AuthService {
       });
     }
 
-    // Đặt link ảnh demo tạm thời
-    const profilePictureUrl = 'https://www.gravatar.com/avatar/?d=mp'; // Link ảnh icon người dùng demo
+    const profilePictureUrl = 'https://www.gravatar.com/avatar/?d=mp'; // Ảnh mặc định
 
     // Tạo người dùng mới với dữ liệu từ bảng OTP và ảnh demo
     const newUser = await this.userService.createUser(
@@ -99,48 +103,38 @@ export class AuthService {
     };
   }
 
+  // Đăng nhập người dùng
   async login(email: string, password: string) {
     const user = await this.userService.findUserByEmail(email);
     if (!user) {
-      throw new BadRequestException('Email không tồn tại');
+      throw new BadRequestException({
+        status: 'error',
+        message: 'Email không tồn tại',
+        data: null,
+      });
     }
     if (!(await bcrypt.compare(password, user.password))) {
-      throw new BadRequestException('Mật khẩu không hợp lệ, vui lòng thử lại');
+      throw new BadRequestException({
+        status: 'error',
+        message: 'Mật khẩu không đúng, vui lòng kiểm tra lại',
+        data: null,
+      });
     }
 
-    // Tạo payload cho token
-    const payload = {
-      sub: user.id,
-      email: user.email,
-    };
-
-    // Tạo token JWT
+    const payload = { sub: user.id, email: user.email };
     const token = this.jwtService.sign(payload);
 
-    // Trả về token và thông tin chi tiết của người dùng
     return {
       status: 'success',
       message: 'Đăng nhập thành công.',
       data: {
-        token: token,
-        user: {
-          id: user.id,
-          email: user.email,
-          phone: user.phone,
-          companyName: user.companyName,
-          address: user.address,
-          businessCode: user.businessCode,
-          taxCode: user.taxCode,
-          representativeName: user.representativeName,
-          representativeUrl: user.representativeUrl,
-          profilePictureUrl: user.profilePictureUrl,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
-        },
+        token,
+        user,
       },
     };
   }
 
+  // Quên mật khẩu
   async forgotPassword(email: string) {
     const user = await this.userService.findUserByEmail(email);
     if (!user) {
@@ -191,7 +185,6 @@ export class AuthService {
     }
 
     const token = this.jwtService.sign({ email });
-
     await this.otpForgotPasswordService.deleteOtp(email);
 
     return {
@@ -221,6 +214,57 @@ export class AuthService {
       status: 'success',
       message: 'Mật khẩu đã được đặt lại thành công.',
       data: null,
+    };
+  }
+
+  async verifyGoogleToken(idToken: string) {
+    if (!idToken) {
+      throw new BadRequestException(
+        'idToken không hợp lệ hoặc không được cung cấp.',
+      );
+    }
+
+    try {
+      const ticket = await this.client.verifyIdToken({
+        idToken,
+        audience:
+          '193742166494-vhvkbi0atp26iu8m0tlnph4js6nu32lu.apps.googleusercontent.com',
+      });
+      const payload = ticket.getPayload();
+
+      if (!payload) {
+        throw new Error('Không xác minh được token Google.');
+      }
+
+      return payload; // Trả về thông tin người dùng từ Google
+    } catch (error) {
+      console.error('Error verifying Google token:', error);
+      throw new BadRequestException('Xác minh Google Token thất bại.');
+    }
+  }
+
+  // Đăng nhập với Google
+  async loginWithGoogle(idToken: string) {
+    const googleUser = await this.verifyGoogleToken(idToken);
+
+    if (!googleUser) {
+      throw new BadRequestException({
+        status: 'error',
+        message: 'Invalid Google Token',
+        data: null,
+      });
+    }
+
+    const user = await this.userService.findOrCreateUser(googleUser);
+    const token = this.jwtService.sign({ sub: user.id, email: user.email });
+
+    return {
+      status: 'success',
+      message: 'Đăng nhập Google thành công.',
+      data: {
+        token,
+        user,
+      },
     };
   }
 }
