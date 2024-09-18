@@ -7,6 +7,8 @@ import {
   Req,
   Get,
   Delete,
+  Patch,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ChatService } from '../services/chat.service';
 import { CreateChatDto } from '../dtos/create-chat.dto';
@@ -18,6 +20,7 @@ import {
   ApiOperation,
   ApiResponse,
 } from '@nestjs/swagger';
+import { UpdateContractImageDto } from '../dtos/update-contract-image.dto';
 
 @ApiTags('Chat')
 @ApiBearerAuth()
@@ -111,5 +114,47 @@ export class ChatController {
   ) {
     const userId = req.user.userId; // Lấy userId từ token JWT
     return this.chatService.deleteConversation(conversationId, userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch(':conversationId/contract-image')
+  @ApiOperation({
+    summary: 'Cập nhật URL ảnh hợp đồng cho cuộc trò chuyện',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Ảnh hợp đồng đã được cập nhật thành công.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Không tìm thấy cuộc trò chuyện.',
+  })
+  async updateContractImage(
+    @Param('conversationId') conversationId: string,
+    @Body() updateContractImageDto: UpdateContractImageDto,
+    @Req() req,
+  ) {
+    const userId = req.user.userId; // Lấy userId từ token JWT
+    return this.chatService.updateContractImage(
+      conversationId,
+      updateContractImageDto.imageUrl,
+      userId,
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':conversationId')
+  @ApiOperation({ summary: 'Lấy thông tin chi tiết cuộc trò chuyện' })
+  async getConversation(
+    @Param('conversationId') conversationId: string,
+    @Req() req,
+  ) {
+    const userId = req.user?.userId; // Lấy userId từ token JWT
+
+    if (!userId) {
+      throw new UnauthorizedException('Không thể xác thực người dùng.');
+    }
+
+    return this.chatService.getConversation(conversationId, userId);
   }
 }

@@ -80,6 +80,7 @@ model Conversation {
   receiver       User         @relation("UserConversationsReceived", fields: [receiverId], references: [id]) // Người nhận cuộc hội thoại
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
+  contractImageUrl String?
   messages       Message[]    @relation("ConversationMessages") // Danh sách tin nhắn trong cuộc hội thoại
 }
 

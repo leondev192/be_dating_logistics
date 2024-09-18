@@ -232,4 +232,54 @@ export class ChatService {
       throw new Error('Lỗi khi xóa cuộc trò chuyện.');
     }
   }
+  async updateContractImage(
+    conversationId: string,
+    imageUrl: string,
+    userId: string,
+  ) {
+    // Kiểm tra xem cuộc trò chuyện có tồn tại và người dùng có quyền chỉnh sửa không
+    const conversation = await this.prisma.conversation.findFirst({
+      where: {
+        id: conversationId,
+        OR: [{ senderId: userId }, { receiverId: userId }],
+      },
+    });
+
+    if (!conversation) {
+      throw new NotFoundException('Không tìm thấy cuộc trò chuyện.');
+    }
+
+    // Cập nhật URL ảnh hợp đồng
+    return this.prisma.conversation.update({
+      where: { id: conversationId },
+      data: { contractImageUrl: imageUrl },
+    });
+  }
+
+  // src/modules/chat/services/chat.service.ts
+  async getConversation(conversationId: string, userId: string) {
+    console.log(
+      `Fetching conversation with ID: ${conversationId} for user: ${userId}`,
+    );
+
+    const conversation = await this.prisma.conversation.findFirst({
+      where: {
+        id: conversationId,
+        OR: [{ senderId: userId }, { receiverId: userId }],
+      },
+      select: {
+        id: true,
+        contractImageUrl: true, // Đảm bảo bao gồm contractImageUrl
+        sender: true,
+        receiver: true,
+      },
+    });
+
+    if (!conversation) {
+      console.log('Không tìm thấy cuộc trò chuyện');
+      throw new NotFoundException('Không tìm thấy cuộc trò chuyện.');
+    }
+
+    return conversation;
+  }
 }
