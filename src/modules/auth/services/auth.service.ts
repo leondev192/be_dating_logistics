@@ -1,4 +1,3 @@
-// src/modules/auth/services/auth.service.ts
 import {
   Injectable,
   BadRequestException,
@@ -95,6 +94,9 @@ export class AuthService {
 
     // Xóa OTP sau khi tạo tài khoản người dùng
     await this.otpService.deleteOtp(email);
+
+    // Gửi email chào mừng
+    await this.emailService.sendWelcomeEmail(email);
 
     return {
       status: 'success',
