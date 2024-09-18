@@ -66,4 +66,27 @@ export class EmailService {
       throw new Error('Không thể gửi email OTP.');
     }
   }
+  async sendWelcomeEmail(email: string) {
+    try {
+      await this.transporter.sendMail({
+        from: `"Dating Logistics Support" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: 'Chào Mừng Bạn Đến Với Dating Logistics!',
+        html: `
+          <div style="font-family: Arial, sans-serif; color: #333;">
+            <h2>Chào mừng bạn đến với Dating Logistics!</h2>
+            <p>Chúng tôi rất vui mừng chào đón bạn đến với nền tảng của chúng tôi. Với tài khoản của bạn, bạn sẽ có thể đăng bài tìm kiếm vận tải và kết nối với các đối tác vận tải một cách nhanh chóng và hiệu quả.</p>
+            <p>Nếu bạn có bất kỳ thắc mắc nào, đừng ngần ngại liên hệ với chúng tôi qua email này. Chúng tôi luôn sẵn sàng hỗ trợ bạn.</p>
+            <p>Chúc bạn có những trải nghiệm tuyệt vời với Dating Logistics!</p>
+            <p>Trân trọng,</p>
+            <p>Đội ngũ Dating Logistics</p>
+          </div>
+        `,
+      });
+      console.log(`Email chào mừng đã được gửi thành công đến ${email}`);
+    } catch (error) {
+      console.error('Error sending welcome email:', error);
+      throw new Error('Không thể gửi email chào mừng.');
+    }
+  }
 }

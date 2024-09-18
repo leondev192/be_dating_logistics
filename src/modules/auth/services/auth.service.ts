@@ -217,6 +217,33 @@ export class AuthService {
     };
   }
 
+  async loginWithGoogle(idToken: string) {
+    const googleUser = await this.verifyGoogleToken(idToken);
+
+    if (!googleUser) {
+      throw new BadRequestException({
+        status: 'error',
+        message: 'Invalid Google Token',
+        data: null,
+      });
+    }
+
+    const user = await this.userService.findOrCreateUser(googleUser);
+    const token = this.jwtService.sign({ sub: user.id, email: user.email });
+
+    // Gửi email chào mừng sau khi đăng nhập thành công
+    await this.emailService.sendWelcomeEmail(user.email);
+
+    return {
+      status: 'success',
+      message: 'Đăng nhập Google thành công.',
+      data: {
+        token,
+        user,
+      },
+    };
+  }
+
   async verifyGoogleToken(idToken: string) {
     if (!idToken) {
       throw new BadRequestException(
@@ -241,30 +268,5 @@ export class AuthService {
       console.error('Error verifying Google token:', error);
       throw new BadRequestException('Xác minh Google Token thất bại.');
     }
-  }
-
-  // Đăng nhập với Google
-  async loginWithGoogle(idToken: string) {
-    const googleUser = await this.verifyGoogleToken(idToken);
-
-    if (!googleUser) {
-      throw new BadRequestException({
-        status: 'error',
-        message: 'Invalid Google Token',
-        data: null,
-      });
-    }
-
-    const user = await this.userService.findOrCreateUser(googleUser);
-    const token = this.jwtService.sign({ sub: user.id, email: user.email });
-
-    return {
-      status: 'success',
-      message: 'Đăng nhập Google thành công.',
-      data: {
-        token,
-        user,
-      },
-    };
   }
 }
